@@ -5,6 +5,7 @@
 #include <chrono>
 #include <string>
 #include <unordered_map>
+#include <iomanip>
 
 using namespace std;
 
@@ -191,8 +192,7 @@ void simulatedAnnealing(const Netlist& netlist,
                 // Reject the swap with a probability based on the temperature
                 double acceptanceProb = exp(-deltaL / currentTemperature);
                 if (probabilityDist(gen) > acceptanceProb) {
-                    // Reject the swap and revert the cells back to their original
-                    // positions
+                    // Reject the swap and revert the cells back to their original positions
                     swap(grid[cell1Row][cell1Col], grid[cell2Row][cell2Col]);
                 }
                 else {
@@ -203,33 +203,31 @@ void simulatedAnnealing(const Netlist& netlist,
         }
 
         // Decrease the temperature using the cooling rate
-        // currentTemperature = schedule_temp(
-        //     currentTemperature, coolingRates[gen() % coolingRates.size()]);
-
         for (int i = 0; i < coolingRates.size(); ++i) {
             currentTemperature = schedule_temp(currentTemperature, coolingRates[i]);
         }
-
     }
 
     // Print the final placement and cost
     cout << "Final Placement:" << endl;
     for (const auto& row : grid) {
         for (const string& cell : row) {
-            cout << cell << " ";
+            cout << setw(3) << cell << " ";
         }
         cout << endl;
     }
 
+    cout << "Binary Placement:" << endl;
     for (const auto& row : grid) {
         for (const string& cell : row) {
-            cout << (cell == "--" ? "1" : "0") << " ";
+            cout << (cell == "--" ? "0" : "1") << " ";
         }
         cout << endl;
     }
 
     cout << "Final Cost (Wire Length): " << initialCost << endl;
 }
+
 
 int main() {
     Netlist netlist = parseNetlistFile("netlist.txt");
@@ -254,21 +252,22 @@ int main() {
     cout << "Initial Grid:" << endl;
     for (int i = 0; i < netlist.numRows; ++i) {
         for (int j = 0; j < netlist.numColumns; ++j) {
-            cout << grid[i][j] << " ";
+            cout << setw(3) << grid[i][j] << " ";
         }
         cout << endl;
     }
 
+    cout << "Binary Grid:" << endl;
     for (const auto& row : grid) {
         for (const string& cell : row) {
-            cout << (cell == "--" ? "1" : "0") << " ";
+            cout << (cell == "--" ? "0" : "1") << " ";
         }
         cout << endl;
     }
 
     cout << "Wirelength of initial placement: "
-        << estimateWireLength(grid, netlist);
-    cout << endl;
+        << estimateWireLength(grid, netlist) << endl;
+
 
     vector<double> coolingRates = { 0.75, 0.8, 0.85, 0.9, 0.95 };
 
