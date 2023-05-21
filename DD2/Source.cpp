@@ -78,6 +78,34 @@ void placeCellsRandomly(vector<vector<string>>& grid, const Netlist& netlist) {
 
 }
 
+// double estimateWireLength(const vector<vector<string>> &grid,
+//                           const Netlist &netlist) {
+//   double wireLength = 0.0;
+
+//   for (const Net &net : netlist.nets) {
+//     int minRow = grid.size();    // Initialize with maximum possible value
+//     int maxRow = -1;             // Initialize with minimum possible value
+//     int minCol = grid[0].size(); // Initialize with maximum possible value
+//     int maxCol = -1;             // Initialize with minimum possible value
+
+//     for (int component : net.components) {
+//       for (int i = 0; i < grid.size(); ++i) {
+//         for (int j = 0; j < grid[0].size(); ++j) {
+//           if (grid[i][j] == to_string(component)) {
+//             minRow = min(minRow, i);
+//             maxRow = max(maxRow, i);
+//             minCol = min(minCol, j);
+//             maxCol = max(maxCol, j);
+//           }
+//         }
+//       }
+//     }
+
+//     wireLength += (maxRow - minRow) + (maxCol - minCol);
+//   }
+
+//   return wireLength;
+// }
 
 double estimateWireLength(const vector<vector<string>>& grid, const Netlist& netlist) {
     double wireLength = 0.0; // HPWL Calculation
@@ -118,7 +146,7 @@ double schedule_temp(double currentTemp, double coolingRate) {
 }
 
 void simulatedAnnealing(const Netlist& netlist,
-    const  double coolingRates) {
+    const double coolingRates) {
     // Create the initial placement
     vector<vector<string>> grid = createInitialGrid(netlist);
     placeCellsRandomly(grid, netlist);
@@ -152,6 +180,11 @@ void simulatedAnnealing(const Netlist& netlist,
             // Calculate the new cost (wire length)
             double newCost = estimateWireLength(grid, netlist);
 
+            std::ofstream myfile;
+            myfile.open("tempVStwl.csv", std::ios::app);  // Use the ios::app flag to append to the file
+            myfile << currentTemperature << "," << newCost << std::endl;
+            myfile.close();
+
             // Calculate the change in cost (delta L)
             double deltaL = newCost - initialCost;
 
@@ -172,10 +205,10 @@ void simulatedAnnealing(const Netlist& netlist,
                     initialCost = newCost;
                 }
             }
-        }
 
-       currentTemperature = schedule_temp(currentTemperature, coolingRates);
-    
+        }
+        
+        currentTemperature = schedule_temp(currentTemperature, coolingRates);
     }
 
     // Print the final placement and cost
@@ -194,8 +227,15 @@ void simulatedAnnealing(const Netlist& netlist,
         }
         cout << endl;
     }
+    //output cooling rate and final cost to csv file
 
-    cout << "Final Cost (Wire Length): " << initialCost << endl;
+    std::ofstream myfile;
+    myfile.open("outputd1.csv", std::ios::app);  // Use the ios::app flag to append to the file
+    myfile << coolingRates << "," << initialCost << std::endl;
+    myfile.close();
+
+
+    //cout << "Final Cost (Wire Length): " << initialCost << endl;
 }
 
 
@@ -206,6 +246,15 @@ int main() {
     cout << "Number of connections: " << netlist.numConnections << endl;
     cout << "Number of rows: " << netlist.numRows << endl;
     cout << "Number of columns: " << netlist.numColumns << endl;
+
+    // cout << "Nets:" << endl;
+    // for (const Net &net : netlist.nets) {
+    //   cout << "Components: ";
+    //   for (int component : net.components) {
+    //     cout << component << " ";
+    //   }
+    //   cout << endl;
+    // }
 
     vector<vector<string>> grid = createInitialGrid(netlist);
     placeCellsRandomly(grid, netlist);
@@ -229,11 +278,17 @@ int main() {
     cout << "Wirelength of initial placement: "
         << estimateWireLength(grid, netlist) << endl;
 
-    
-    double coolingRates = 0.75;
-    
+
+    vector<double> coolingRates = { 0.75};
+
+
     auto startTime = chrono::high_resolution_clock::now();
-    simulatedAnnealing(netlist, coolingRates);
+    for (int i = 0; i < coolingRates.size(); ++i)
+    {
+        cout << "Cooling Rate: " << coolingRates[i] << endl;
+        simulatedAnnealing(netlist, coolingRates[i]);
+    }
+
     auto endTime = chrono::high_resolution_clock::now();
 
     double elapsedTime = chrono::duration<double>(endTime - startTime).count();
