@@ -132,6 +132,8 @@ void simulatedAnnealing(const Netlist& netlist,
     double finalTemperature = 5e-6 * initialCost / netlist.numConnections;
     double currentTemperature = initialTemperature;
 
+    double bestCostTemp = 0.0;
+
     // Set number of moves per temperature based on number of cells
     int movesPerTemperature = 10 * netlist.numCells;
 
@@ -152,11 +154,8 @@ void simulatedAnnealing(const Netlist& netlist,
 
             // Calculate the new cost (wire length)
             double newCost = estimateWireLength(grid, netlist);
-
-            std::ofstream myfile;
-            myfile.open("tempVStwl.csv", std::ios::app);  // Use the ios::app flag to append to the file
-            myfile << currentTemperature << "," << newCost << std::endl;
-            myfile.close();
+            bestCostTemp = newCost;
+          
 
             // Calculate the change in cost (delta L)
             double deltaL = newCost - initialCost;
@@ -182,6 +181,11 @@ void simulatedAnnealing(const Netlist& netlist,
         }
         
         currentTemperature = schedule_temp(currentTemperature, coolingRates);
+        //std::ofstream myfile;
+        //myfile.open("tempVStwlT3.csv", std::ios::app);  // Use the ios::app flag to append to the file
+        //myfile << currentTemperature << "," << bestCostTemp << std::endl;
+        //myfile.close();
+
     }
 
     // Print the final placement and cost
@@ -208,7 +212,7 @@ void simulatedAnnealing(const Netlist& netlist,
     myfile.close();
 
 
-    //cout << "Final Cost (Wire Length): " << initialCost << endl;
+    cout << "Final Cost (Wire Length): " << initialCost << endl;
 }
 
 
@@ -252,7 +256,7 @@ int main() {
         << estimateWireLength(grid, netlist) << endl;
 
 
-    vector<double> coolingRates = { 0.75};
+    vector<double> coolingRates = {0.75, 0.8, 0.85, 0.9, 0.95 };
 
 
     auto startTime = chrono::high_resolution_clock::now();
