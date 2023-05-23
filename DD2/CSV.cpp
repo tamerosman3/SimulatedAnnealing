@@ -78,34 +78,7 @@ void placeCellsRandomly(vector<vector<string>>& grid, const Netlist& netlist) {
 
 }
 
-// double estimateWireLength(const vector<vector<string>> &grid,
-//                           const Netlist &netlist) {
-//   double wireLength = 0.0;
 
-//   for (const Net &net : netlist.nets) {
-//     int minRow = grid.size();    // Initialize with maximum possible value
-//     int maxRow = -1;             // Initialize with minimum possible value
-//     int minCol = grid[0].size(); // Initialize with maximum possible value
-//     int maxCol = -1;             // Initialize with minimum possible value
-
-//     for (int component : net.components) {
-//       for (int i = 0; i < grid.size(); ++i) {
-//         for (int j = 0; j < grid[0].size(); ++j) {
-//           if (grid[i][j] == to_string(component)) {
-//             minRow = min(minRow, i);
-//             maxRow = max(maxRow, i);
-//             minCol = min(minCol, j);
-//             maxCol = max(maxCol, j);
-//           }
-//         }
-//       }
-//     }
-
-//     wireLength += (maxRow - minRow) + (maxCol - minCol);
-//   }
-
-//   return wireLength;
-// }
 
 double estimateWireLength(const vector<vector<string>>& grid, const Netlist& netlist) {
     double wireLength = 0.0; // HPWL Calculation
