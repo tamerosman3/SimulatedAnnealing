@@ -146,36 +146,39 @@ void simulatedAnnealing(const Netlist& netlist,
             int cell2Row = gen() % netlist.numRows;
             int cell2Col = gen() % netlist.numColumns;
 
-            // Swap the cells in the grid
-            swap(grid[cell1Row][cell1Col], grid[cell2Row][cell2Col]);
+            // Check if both cells are empty before swapping
+            if ((grid[cell1Row][cell1Col] != "--" && grid[cell2Row][cell2Col] != "--") ||
+                (grid[cell1Row][cell1Col] != "--" && grid[cell2Row][cell2Col] == "--") ||
+                (grid[cell1Row][cell1Col] == "--" && grid[cell2Row][cell2Col] != "--")) {
+                // Swap the cells in the grid
+                swap(grid[cell1Row][cell1Col], grid[cell2Row][cell2Col]);
 
-            // Calculate the new cost (wire length)
-            double newCost = estimateWireLength(grid, netlist);
+                // Calculate the new cost (wire length)
+                double newCost = estimateWireLength(grid, netlist);
 
-            // Calculate the change in cost (delta L)
-            double deltaL = newCost - initialCost;
+                // Calculate the change in cost (delta L)
+                double deltaL = newCost - initialCost;
 
-            // Accept or reject the swap based on the Metropolis criterion
-            if (deltaL < 0) {
-                // Accept the swap if it improves the cost
-                initialCost = newCost;
-            }
-            else {
-                // Reject the swap with a probability based on the temperature
-                double acceptanceProb = exp(-deltaL / currentTemperature);
-                if (probabilityDist(gen) > acceptanceProb) {
-                    // Reject the swap and revert the cells back to their original positions
-                    swap(grid[cell1Row][cell1Col], grid[cell2Row][cell2Col]);
+                // Accept or reject the swap based on the Metropolis criterion
+                if (deltaL < 0) {
+                    // Accept the swap if it improves the cost
+                    initialCost = newCost;
                 }
                 else {
-                    // Accept the swap
-                    initialCost = newCost;
+                    // Reject the swap with a probability based on the temperature
+                    double acceptanceProb = exp(-deltaL / currentTemperature);
+                    if (probabilityDist(gen) > acceptanceProb) {
+                        // Reject the swap and revert the cells back to their original positions
+                        swap(grid[cell1Row][cell1Col], grid[cell2Row][cell2Col]);
+                    }
+                    else {
+                        // Accept the swap
+                        initialCost = newCost;
+                    }
                 }
             }
         }
-
         currentTemperature = schedule_temp(currentTemperature, coolingRates);
-
     }
 
     // Print the final placement and cost
@@ -243,3 +246,4 @@ int main() {
 
     return 0;
 }
+
