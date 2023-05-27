@@ -6,7 +6,6 @@
 #include <string>
 #include <unordered_map>
 #include <iomanip>
-#include <opencv2/opencv.hpp>
 
 using namespace std;
 
@@ -215,32 +214,6 @@ void simulatedAnnealing(const Netlist& netlist,
 
     cout << "Final Cost (Wire Length): " << initialCost << endl;
 }
-
-void displayPlacement(const vector<vector<string>>& grid) {
-    cv::Mat image(grid.size(), grid[0].size(), CV_8UC3, cv::Scalar(255, 255, 255));
-
-    int cellSize = 30;  // Adjust the cell size according to your preference
-    int xOffset = 10;
-    int yOffset = 10;
-
-    for (int i = 0; i < grid.size(); ++i) {
-        for (int j = 0; j < grid[0].size(); ++j) {
-            if (grid[i][j] != "--") {
-                int cellId = std::stoi(grid[i][j]);
-                cv::rectangle(image, cv::Point(xOffset + j * cellSize, yOffset + i * cellSize),
-                    cv::Point(xOffset + (j + 1) * cellSize, yOffset + (i + 1) * cellSize),
-                    cv::Scalar(0, 0, 0), cv::FILLED);
-                cv::putText(image, std::to_string(cellId),
-                    cv::Point(xOffset + j * cellSize + cellSize / 3, yOffset + i * cellSize + cellSize / 2),
-                    cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
-            }
-        }
-    }
-
-    cv::imshow("Placement Progress", image);
-    cv::waitKey(200);  // Adjust the delay between frames as needed
-}
-
 
 int main() {
     Netlist netlist = parseNetlistFile("netlist.txt");
