@@ -149,35 +149,40 @@ void simulatedAnnealing(const Netlist& netlist,
             int cell2Row = gen() % netlist.numRows;
             int cell2Col = gen() % netlist.numColumns;
 
-            // Swap the cells in the grid
-            swap(grid[cell1Row][cell1Col], grid[cell2Row][cell2Col]);
+            // Check if both cells are empty before swapping
+            if ((grid[cell1Row][cell1Col] != "--" && grid[cell2Row][cell2Col] != "--") ||
+                (grid[cell1Row][cell1Col] != "--" && grid[cell2Row][cell2Col] == "--") ||
+                (grid[cell1Row][cell1Col] == "--" && grid[cell2Row][cell2Col] != "--")) {
+                // Swap the cells in the grid
+                swap(grid[cell1Row][cell1Col], grid[cell2Row][cell2Col]);
 
-            // Calculate the new cost (wire length)
-            double newCost = estimateWireLength(grid, netlist);
-            bestCostTemp = newCost;
-          
+                // Calculate the new cost (wire length)
+                double newCost = estimateWireLength(grid, netlist);
+                bestCostTemp = newCost;
 
-            // Calculate the change in cost (delta L)
-            double deltaL = newCost - initialCost;
 
-            // Accept or reject the swap based on the Metropolis criterion
-            if (deltaL < 0) {
-                // Accept the swap if it improves the cost
-                initialCost = newCost;
-            }
-            else {
-                // Reject the swap with a probability based on the temperature
-                double acceptanceProb = exp(-deltaL / currentTemperature);
-                if (probabilityDist(gen) > acceptanceProb) {
-                    // Reject the swap and revert the cells back to their original positions
-                    swap(grid[cell1Row][cell1Col], grid[cell2Row][cell2Col]);
-                }
-                else {
-                    // Accept the swap
+                // Calculate the change in cost (delta L)
+                double deltaL = newCost - initialCost;
+
+                // Accept or reject the swap based on the Metropolis criterion
+                if (deltaL < 0) {
+                    // Accept the swap if it improves the cost
                     initialCost = newCost;
                 }
-            }
+                else {
+                    // Reject the swap with a probability based on the temperature
+                    double acceptanceProb = exp(-deltaL / currentTemperature);
+                    if (probabilityDist(gen) > acceptanceProb) {
+                        // Reject the swap and revert the cells back to their original positions
+                        swap(grid[cell1Row][cell1Col], grid[cell2Row][cell2Col]);
+                    }
+                    else {
+                        // Accept the swap
+                        initialCost = newCost;
+                    }
+                }
 
+            }
         }
         
         currentTemperature = schedule_temp(currentTemperature, coolingRates);
@@ -192,7 +197,7 @@ void simulatedAnnealing(const Netlist& netlist,
     cout << "Final Placement:" << endl;
     for (const auto& row : grid) {
         for (const string& cell : row) {
-            cout << setw(3) << cell << " ";
+            cout << setw(4) << cell << " ";
         }
         cout << endl;
     }
@@ -238,7 +243,7 @@ int main() {
     cout << "Initial Grid:" << endl;
     for (int i = 0; i < netlist.numRows; ++i) {
         for (int j = 0; j < netlist.numColumns; ++j) {
-            cout << setw(3) << grid[i][j] << " ";
+            cout << setw(4) << grid[i][j] << " ";
         }
         cout << endl;
     }
