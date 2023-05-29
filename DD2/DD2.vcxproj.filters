@@ -19,4 +19,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="d0.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="d1.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="d2.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="d3.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="t1.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="t2.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="t3.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

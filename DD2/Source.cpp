@@ -147,7 +147,10 @@ void simulatedAnnealing(const Netlist& netlist,
             int cell2Col = gen() % netlist.numColumns;
 
             // Check if both cells are empty before swapping
-           
+            if ((grid[cell1Row][cell1Col] != "--" && grid[cell2Row][cell2Col] != "--") ||
+                (grid[cell1Row][cell1Col] != "--" && grid[cell2Row][cell2Col] == "--") ||
+                (grid[cell1Row][cell1Col] == "--" && grid[cell2Row][cell2Col] != "--")) {
+
                 // Swap the cells in the grid
                 swap(grid[cell1Row][cell1Col], grid[cell2Row][cell2Col]);
 
@@ -174,7 +177,7 @@ void simulatedAnnealing(const Netlist& netlist,
                         initialCost = newCost;
                     }
                 }
-            
+            }
         }
         currentTemperature = schedule_temp(currentTemperature, coolingRates);
     }
@@ -200,8 +203,18 @@ void simulatedAnnealing(const Netlist& netlist,
 }
 
 
+
 int main() {
-    Netlist netlist = parseNetlistFile("netlist.txt");
+    string fileName;
+    double coolingRate;
+
+    cout << "Enter the name of the file to run (perhaps d1.txt): ";
+    cin >> fileName;
+
+    cout << "Enter the cooling rate (perhaps one of the following: 0.75, 0.8, 0.85, 0.9, and 0.95): ";
+    cin >> coolingRate;
+
+    Netlist netlist = parseNetlistFile(fileName);
 
     cout << "Number of cells: " << netlist.numCells << endl;
     cout << "Number of connections: " << netlist.numConnections << endl;
@@ -230,18 +243,13 @@ int main() {
     cout << "Wirelength of initial placement: "
         << estimateWireLength(grid, netlist) << endl;
 
-
-    double coolingRates = 0.75;
-
     auto startTime = chrono::high_resolution_clock::now();
-    simulatedAnnealing(netlist, coolingRates);
+    simulatedAnnealing(netlist, coolingRate);
     auto endTime = chrono::high_resolution_clock::now();
 
     double elapsedTime = chrono::duration<double>(endTime - startTime).count();
 
-    cout << "Execution time: " << elapsedTime << "seconds";
-
+    cout << "Execution time: " << elapsedTime << " seconds";
 
     return 0;
 }
-

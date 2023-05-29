@@ -153,6 +153,15 @@
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="d0.txt" />
+    <Text Include="d1.txt" />
+    <Text Include="d2.txt" />
+    <Text Include="d3.txt" />
+    <Text Include="t1.txt" />
+    <Text Include="t2.txt" />
+    <Text Include="t3.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
